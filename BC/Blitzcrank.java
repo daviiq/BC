@@ -1,6 +1,6 @@
 package BC;
 import robocode.*;
-//import java.awt.Color;
+import java.awt.Color;
 
 // API help : https://robocode.sourceforge.io/docs/robocode/robocode/Robot.html
 
@@ -21,7 +21,13 @@ public class Blitzcrank extends Robot
 		// setColors(Color.red,Color.blue,Color.green); // body,gun,radar
 
 		// Robot main loop
-		while(true) {
+		
+//Cor do Robo:
+setColors(Color.yellow,Color.darkGray,Color.gray);
+setBulletColor(Color.yellow);
+setScanColor(Color.gray);	
+
+	while(true) {
 			// Replace the next 4 lines with any behavior you would like
 			ahead(100);
 			turnGunRight(360);
