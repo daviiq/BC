@@ -1,62 +1,69 @@
 package BC;
 import robocode.*;
 import java.awt.Color;
+import java.util.Random;
 
-// API help : https://robocode.sourceforge.io/docs/robocode/robocode/Robot.html
+public class Blitzcrank extends Robot {
+    Random rand = new Random();
+    boolean peek;
+    double moveAmount;
+    boolean invertido = false; // controla se já inverteu direção
 
-/**
- * Blitzcrank - a robot by (your name here)
- */
-public class Blitzcrank extends Robot
-{
-	/**
-	 * run: Blitzcrank's default behavior
-	 */
-	public void run() {
-		// Initialization of the robot should be put here
+    public void run() {
+        setColors(Color.yellow,Color.darkGray,Color.gray);
+        setBulletColor(Color.yellow);
+        setScanColor(Color.gray);
 
-		// After trying out your robot, try uncommenting the import at the top,
-		// and the next line:
+        moveAmount = Math.max(getBattleFieldWidth(), getBattleFieldHeight());
+        peek = false;
 
-		// setColors(Color.red,Color.blue,Color.green); // body,gun,radar
+        // Alinha com a parede
+        turnLeft(getHeading() % 90);
+        ahead(moveAmount);
+        peek = true;
+        turnGunRight(90);
+        turnRight(90);
 
-		// Robot main loop
-		
-//Cor do Robo:
-setColors(Color.yellow,Color.darkGray,Color.gray);
-setBulletColor(Color.yellow);
-setScanColor(Color.gray);	
+        while (true) {
+            peek = true;
+            ahead(moveAmount);
+            peek = false;
 
-	while(true) {
-			// Replace the next 4 lines with any behavior you would like
-			ahead(100);
-			turnGunRight(360);
-			back(100);
-			turnGunRight(360);
-		}
-	}
+            turnRight(90);
 
-	/**
-	 * onScannedRobot: What to do when you see another robot
-	 */
-	public void onScannedRobot(ScannedRobotEvent e) {
-		// Replace the next line with any behavior you would like
-		fire(1);
-	}
+            // Se estiver invertido, já que deu uma volta, volta a zerar o estado
+            if (invertido) {
+                invertido = false; 
+            }
+        }
+    }
 
-	/**
-	 * onHitByBullet: What to do when you're hit by a bullet
-	 */
-	public void onHitByBullet(HitByBulletEvent e) {
-		// Replace the next line with any behavior you would like
-		back(10);
-	}
-	
-	/**
-	 * onHitWall: What to do when you hit a wall
-	 */
-	public void onHitWall(HitWallEvent e) {
-		// Replace the next line with any behavior you would like
-		back(20);
-	}	
+    public void onScannedRobot(ScannedRobotEvent e) {
+        fire(1);
+    }
+	// Quando atingir robo com robo
+    public void onHitRobot(HitRobotEvent e) {
+        if (e.getBearing() > -90 && e.getBearing() < 90) {
+            back(100);
+        } else {
+            ahead(100);
+        }
+    }
+
+    public void onHitByBullet(HitByBulletEvent e) {
+        if (!invertido) {
+            invertido = true;
+
+            // Para o movimento atual
+            stop();
+
+            // Vira 180 graus para ir na direção oposta
+            turnRight(180);
+			turnGunRight(180);
+
+            // Corre para a parede oposta
+            ahead(moveAmount);
+			turnGunRight(180);
+        }
+    }
 }
