@@ -7,7 +7,7 @@ public class Blitzcrank extends Robot {
     Random rand = new Random();
     boolean peek;
     double moveAmount;
-    boolean invertido = false; // controla se já inverteu direção
+    boolean invertido = false;
 
     public void run() {
         setColors(Color.yellow,Color.darkGray,Color.gray);
@@ -17,7 +17,6 @@ public class Blitzcrank extends Robot {
         moveAmount = Math.max(getBattleFieldWidth(), getBattleFieldHeight());
         peek = false;
 
-        // Alinha com a parede
         turnLeft(getHeading() % 90);
         ahead(moveAmount);
         peek = true;
@@ -28,10 +27,8 @@ public class Blitzcrank extends Robot {
             peek = true;
             ahead(moveAmount);
             peek = false;
-
             turnRight(90);
 
-            // Se estiver invertido, já que deu uma volta, volta a zerar o estado
             if (invertido) {
                 invertido = false; 
             }
@@ -39,10 +36,31 @@ public class Blitzcrank extends Robot {
     }
 
     public void onScannedRobot(ScannedRobotEvent e) {
-        fire(1);
+        // Sistema de tiro adaptativo:
+        double firePower;
+        
+        if (e.getDistance() < 150) { // Curta distância
+            firePower = 3; // Máximo dano
+        } 
+        else if (e.getDistance() < 400) { // Média distância
+            firePower = 2;
+        }
+        else { // Longa distância
+            firePower = 1;
+        }
+        
+        // Precisão extra se o inimigo estiver parado
+        if (e.getVelocity() == 0) {
+            firePower = Math.min(firePower + 0.5, 3);
+        }
+        
+        fire(firePower);
     }
-	// Quando atingir robo com robo
+
     public void onHitRobot(HitRobotEvent e) {
+        // Tiro extra ao colidir
+        fire(3);
+        
         if (e.getBearing() > -90 && e.getBearing() < 90) {
             back(100);
         } else {
@@ -53,17 +71,11 @@ public class Blitzcrank extends Robot {
     public void onHitByBullet(HitByBulletEvent e) {
         if (!invertido) {
             invertido = true;
-
-            // Para o movimento atual
             stop();
-
-            // Vira 180 graus para ir na direção oposta
             turnRight(180);
-			turnGunRight(180);
-
-            // Corre para a parede oposta
+            turnGunRight(180);
             ahead(moveAmount);
-			turnGunRight(180);
+            turnGunRight(180);
         }
     }
 }
