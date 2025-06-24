@@ -5,7 +5,6 @@ import java.util.Random;
 
 public class Blitzcrank extends Robot {
     Random rand = new Random();
-    boolean peek;
     double moveAmount;
     boolean invertido = false;
 
@@ -15,18 +14,14 @@ public class Blitzcrank extends Robot {
         setScanColor(Color.gray);
 
         moveAmount = Math.max(getBattleFieldWidth(), getBattleFieldHeight());
-        peek = false;
 
         turnLeft(getHeading() % 90);
         ahead(moveAmount);
-        peek = true;
         turnGunRight(90);
         turnRight(90);
 
         while (true) {
-            peek = true;
             ahead(moveAmount);
-            peek = false;
             turnRight(90);
 
             if (invertido) {
@@ -73,9 +68,6 @@ public class Blitzcrank extends Robot {
             invertido = true;
             stop();
             turnRight(180);
-            turnGunRight(180);
-            ahead(moveAmount);
-            turnGunRight(180);
         }
     }
 }
